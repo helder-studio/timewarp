@@ -58,6 +58,7 @@ describe('Date patch', () => {
     const a = Date.now();
     await new Promise((r) => setTimeout(r, 20));
     expect(Date.now()).toBe(a);
+    // biome-ignore lint/complexity/useDateNow: checks the constructor path, not Date.now
     expect(new Date().getTime()).toBe(a);
     timewarp.unfreeze();
     await new Promise((r) => setTimeout(r, 20));
