@@ -120,6 +120,23 @@ import { DevDock } from '@helder-studio/dev-dock';
 <DevDock enabled={qa} tabs={[timewarpTab]} />;
 ```
 
+## Let AI coding agents drive it (React Native)
+
+Register `timewarpAgentTools` with [Rozenite for Agents](https://www.rozenite.dev) and an agent can
+say "set the clock to 23:58 on New Year's Eve in German" itself:
+
+```tsx
+import { useRozeniteInAppAgentTool } from '@rozenite/agent-bridge';
+import { timewarpAgentTools } from '@helder-studio/timewarp';
+
+function AgentTools() {
+  for (const t of timewarpAgentTools) useRozeniteInAppAgentTool({ domain: 'helder-studio', ...t });
+  return null;
+}
+```
+
+Tools: `timewarp-set`, `timewarp-travel`, `timewarp-preset`, `timewarp-reset`.
+
 ## Gotchas
 
 - **Install first.** Libraries that capture `Date` at import time keep the real one, so call

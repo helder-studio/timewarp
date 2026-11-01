@@ -1,3 +1,4 @@
+export { type AgentTool, timewarpAgentTools } from './agent';
 export type { TimewarpState, TravelDelta } from './core/clock';
 export type { PresetName } from './core/presets';
 export { type PseudoOptions, pseudoLocalize } from './core/pseudo';

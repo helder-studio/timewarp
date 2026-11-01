@@ -51,3 +51,6 @@ export const pseudoPostProcessor = {
   name: 'pseudo',
   process: (value: string) => value,
 };
+
+export type { AgentTool } from './agent';
+export const timewarpAgentTools: import('./agent').AgentTool[] = [];
