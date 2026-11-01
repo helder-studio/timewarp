@@ -1,5 +1,7 @@
 # @helder-studio/timewarp
 
+nShared rules, commands and conventions: @AGENTS.md
+
 Overrides the app's clock (offset, freeze) and locale, plus an experimental Intl time zone, for QA on
 real devices. React Native + web. PDF: "Library 3: Timewarp".
 
