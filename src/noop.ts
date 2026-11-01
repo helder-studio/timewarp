@@ -33,3 +33,11 @@ export function TimewarpBadge(): null {
 export function TimewarpPanel(): null {
   return null;
 }
+
+export const timewarpTab = {
+  id: 'timewarp',
+  title: 'Time',
+  status: () => null,
+  subscribe: () => noop,
+  render: () => null,
+};

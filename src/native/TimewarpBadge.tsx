@@ -230,3 +230,16 @@ const styles = StyleSheet.create({
   },
   resetText: { fontWeight: '600' },
 });
+
+/**
+ * Tab for `@helder-studio/dev-dock`: `<DevDock tabs={[timewarpTab]} />`. Skip `<TimewarpBadge />`
+ * when using it; the dock button shows the warp instead.
+ */
+export const timewarpTab = {
+  id: 'timewarp',
+  title: 'Time',
+  status: () =>
+    isWarped(timewarp.getState()) ? badgeLabel(timewarp.getState(), timewarp.now()) : null,
+  subscribe: timewarp.subscribe,
+  render: () => <TimewarpPanel />,
+};

@@ -85,6 +85,18 @@ Pass `alwaysShow` to keep the badge visible at real time too. The panel content 
 `<TimewarpPanel />` to embed in your own dev menu. The web build shows the badge; drive it with
 `timewarp.*` for now.
 
+## With dev-dock
+
+Using several helder-studio tools? Put them in one floating panel with
+[`@helder-studio/dev-dock`](https://github.com/helder-studio/dev-dock) and skip `<TimewarpBadge />`:
+
+```tsx
+import { timewarpTab } from '@helder-studio/timewarp';
+import { DevDock } from '@helder-studio/dev-dock';
+
+<DevDock enabled={qa} tabs={[timewarpTab]} />;
+```
+
 ## Gotchas
 
 - **Install first.** Libraries that capture `Date` at import time keep the real one, so call
