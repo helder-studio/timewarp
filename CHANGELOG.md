@@ -1,5 +1,12 @@
 # @helder-studio/timewarp
 
+## 0.2.0
+
+### Minor Changes
+
+- acc0742: Add pseudo-localization (pseudo, pseudoMessages, i18next pseudoPostProcessor) and a right-to-left switch, both in the panel.
+- 0c0a28e: Add timewarpAgentTools (React Native): tool definitions so AI coding agents can set, move and reset the app clock and locale through Rozenite for Agents.
+
 ## 0.1.0
 
 ### Minor Changes
