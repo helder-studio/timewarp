@@ -1,13 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { addDelta, freeze, initialState, isWarped, setTime, unfreeze, virtualNow } from './clock';
 import { nextOffsetChange, presetTime } from './presets';
 
 declare const process: { env: Record<string, string | undefined> };
 
 const originalTz = process.env.TZ;
-beforeAll(() => {
-  process.env.TZ = 'Europe/Amsterdam';
-});
+// Set before any describe body runs: fixtures below are computed at collection time.
+process.env.TZ = 'Europe/Amsterdam';
 afterAll(() => {
   process.env.TZ = originalTz;
 });
