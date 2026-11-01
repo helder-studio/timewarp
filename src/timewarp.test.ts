@@ -132,8 +132,8 @@ describe('install', () => {
     timewarp.uninstall();
     const storage = memory();
     timewarp.install({ enabled: true, storage });
+    timewarp.freeze(); // freeze first: setting the time on a frozen clock is exact
     timewarp.set({ now: '2031-01-01T00:00:00Z', locale: 'fr-FR' });
-    timewarp.freeze();
     timewarp.uninstall();
 
     timewarp.reset(); // in-memory state gone, as after a restart (storage detached)
