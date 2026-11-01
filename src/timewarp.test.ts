@@ -36,6 +36,7 @@ describe('Date patch', () => {
     expect(new Date(2020, 0, 1, 12).getHours()).toBe(12);
     expect(new Date(0).getTime()).toBe(0);
     expect(new Date(JSON.parse(JSON.stringify({ d })).d).getTime()).toBe(d.getTime());
+    expect([Date.name, Date.length]).toEqual(['Date', 7]);
     expect(typeof Date()).toBe('string');
     expect(Date()).toContain('2030');
     class Sub extends Date {}

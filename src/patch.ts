@@ -130,6 +130,9 @@ export function patch(now: () => number, getState: () => TimewarpState): void {
   // Same prototype: `instanceof Date` holds for dates made before and after the patch.
   (WarpedDate as { prototype: Date }).prototype = RealDate.prototype;
   WarpedDate.now = now;
+  // Look like the real constructor to code that inspects `Date.name` / `Date.length`.
+  Object.defineProperty(WarpedDate, 'name', { value: 'Date' });
+  Object.defineProperty(WarpedDate, 'length', { value: 7 });
   globalThis.Date = WarpedDate;
 
   const intl = Intl as unknown as Record<string, unknown>;
