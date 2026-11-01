@@ -158,7 +158,9 @@ describe('experimental time zone getters', () => {
     timewarp.set({ experimental_timeZone: 'Europe/Amsterdam' });
     const before = at(2026, 2, 29, 0, 59);
     const after = at(2026, 2, 29, 1, 0);
-    expect([before.getHours(), before.getMinutes(), before.getTimezoneOffset()]).toEqual([1, 59, -60]);
+    expect([before.getHours(), before.getMinutes(), before.getTimezoneOffset()]).toEqual([
+      1, 59, -60,
+    ]);
     expect([after.getHours(), after.getMinutes(), after.getTimezoneOffset()]).toEqual([3, 0, -120]);
   });
 
@@ -168,7 +170,9 @@ describe('experimental time zone getters', () => {
     const after = at(2026, 10, 1, 6, 0);
     expect([before.getHours(), before.getTimezoneOffset()]).toEqual([1, 240]);
     expect([after.getHours(), after.getTimezoneOffset()]).toEqual([1, 300]);
-    expect([after.getFullYear(), after.getMonth(), after.getDate(), after.getDay()]).toEqual([2026, 10, 1, 0]);
+    expect([after.getFullYear(), after.getMonth(), after.getDate(), after.getDay()]).toEqual([
+      2026, 10, 1, 0,
+    ]);
   });
 
   it('reads the calendar date in the zone and leaves UTC getters alone', () => {
