@@ -41,3 +41,13 @@ export const timewarpTab = {
   subscribe: () => noop,
   render: () => null,
 };
+
+export { type PseudoOptions, pseudoLocalize } from './core/pseudo';
+
+export const pseudo = (text: string) => text;
+export const pseudoMessages = <T extends Record<string, string>>(messages: T): T => messages;
+export const pseudoPostProcessor = {
+  type: 'postProcessor' as const,
+  name: 'pseudo',
+  process: (value: string) => value,
+};

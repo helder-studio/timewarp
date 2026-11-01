@@ -1,5 +1,7 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import {
+  DevSettings,
+  I18nManager,
   Modal,
   Pressable,
   SafeAreaView,
@@ -15,12 +17,22 @@ import { RealDate } from '../patch';
 import { badgeLabel, useTimewarpState, useVirtualNow } from '../react/shared';
 import { timewarp } from '../timewarp';
 
+/** Keeps React Native's RTL flag in line with the warp. It takes effect after a reload. */
+function useNativeRtl(rtl: boolean) {
+  useEffect(() => {
+    if (I18nManager.isRTL === rtl) return;
+    I18nManager.allowRTL(rtl);
+    I18nManager.forceRTL(rtl);
+  }, [rtl]);
+}
+
 /**
  * React Native: a badge while the clock, locale or zone is warped (or always, with `alwaysShow`).
  * Tap it to open the panel. Render it once near the root, after `timewarp.install()`.
  */
 export function TimewarpBadge({ alwaysShow = false }: { alwaysShow?: boolean }) {
   const state = useTimewarpState();
+  useNativeRtl(state.rtl);
   const now = useVirtualNow();
   const [open, setOpen] = useState(false);
   const warped = isWarped(state);
@@ -73,6 +85,7 @@ const ZONES = [null, 'UTC', 'Europe/Amsterdam', 'America/New_York', 'Asia/Tokyo'
 /** The panel content, also usable as a dev-dock tab. */
 export function TimewarpPanel() {
   const state = useTimewarpState();
+  useNativeRtl(state.rtl);
   const now = useVirtualNow();
   const full = new Intl.DateTimeFormat(state.locale ?? undefined, {
     dateStyle: 'full',
@@ -91,6 +104,24 @@ export function TimewarpPanel() {
           onValueChange={(on) => (on ? timewarp.freeze() : timewarp.unfreeze())}
         />
       </View>
+
+      <View style={styles.row}>
+        <Text>Pseudo-localization</Text>
+        <Switch value={state.pseudo} onValueChange={(pseudo) => timewarp.set({ pseudo })} />
+      </View>
+      <View style={styles.row}>
+        <Text>Right-to-left</Text>
+        <Switch value={state.rtl} onValueChange={(rtl) => timewarp.set({ rtl })} />
+      </View>
+      {I18nManager.isRTL !== state.rtl && (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => DevSettings.reload()}
+          style={styles.reset}
+        >
+          <Text style={styles.resetText}>Reload the app to apply right-to-left</Text>
+        </Pressable>
+      )}
 
       <Text style={styles.section}>Jump to</Text>
       <Chips>

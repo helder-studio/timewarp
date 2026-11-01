@@ -35,5 +35,7 @@ export function badgeLabel(state: TimewarpState, now: number): string {
   if (state.frozenAt !== null) parts.push('frozen');
   if (state.locale) parts.push(state.locale);
   if (state.timeZone) parts.push(state.timeZone);
+  if (state.pseudo) parts.push('pseudo');
+  if (state.rtl) parts.push('RTL');
   return parts.join(' · ');
 }

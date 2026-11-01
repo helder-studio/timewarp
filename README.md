@@ -56,6 +56,7 @@ timewarp.reset();
 - ⏩ **Time travel**: set an exact moment or jump by months, weeks, days, hours or minutes
 - 🧊 **Freeze**: stop the clock to test countdowns, expiry and "just now" labels
 - 🌍 **Locale override**: Intl formatting and `toLocale*String` follow your chosen locale
+- 🔤 **Pseudo-localization + RTL**: catch truncation, untranslated strings and mirroring bugs
 - 📍 **Presets**: tomorrow, next week, end of day, end of month, New Year's Eve, right before the next
   DST change
 - 📱 **Panel on the device**: tap the badge for presets, steppers, freeze, locale and zone, with no
@@ -77,6 +78,28 @@ timewarp.reset();
 `instanceof Date`, `Date.UTC`, `Date.parse`, `Date()` and JSON round trips keep working. Timers are
 not touched: this is time travel, not time acceleration. i18n libraries with their own locale setting
 need that setting changed too.
+
+## Pseudo-localization and right-to-left
+
+Find clipped labels, hard-coded strings and mirrored-layout bugs before any translation exists.
+
+```ts
+timewarp.set({ pseudo: true }); // "Save {count} items" → "[Šáṽé {count} îţéɱš one two]"
+timewarp.set({ rtl: true }); // web: dir="rtl"; React Native: I18nManager, after a reload
+```
+
+Strings change only where they pass through an adapter, so pick the one for your i18n library:
+
+```ts
+import { pseudo, pseudoMessages, pseudoPostProcessor } from '@helder-studio/timewarp';
+
+i18next.use(pseudoPostProcessor).init({ postProcess: ['pseudo'] /* … */ }); // i18next
+<IntlProvider messages={pseudoMessages(messages)} locale={locale}>…</IntlProvider>; // react-intl
+pseudo('Checkout'); // anything else
+```
+
+Placeholders (`{name}`, `{{count}}`, ICU plurals, `%s`), tags and entities are left intact; text
+grows by ~35% like German. Both switches are in the panel.
 
 ## Panel
 

@@ -31,6 +31,20 @@ describe('<TimewarpBadge> (web)', () => {
   });
 });
 
+describe('right-to-left on the web', () => {
+  it('sets dir="rtl" on <html> while on and restores the original value', () => {
+    document.documentElement.dir = 'ltr';
+    const el = document.createElement('div');
+    document.body.append(el);
+    act(() => createRoot(el).render(<TimewarpBadge />));
+    act(() => timewarp.set({ rtl: true, pseudo: true }));
+    expect(document.documentElement.dir).toBe('rtl');
+    expect(el.textContent).toContain('pseudo · RTL');
+    act(() => timewarp.set({ rtl: false }));
+    expect(document.documentElement.dir).toBe('ltr');
+  });
+});
+
 describe('badgeLabel', () => {
   it('formats in the warped zone and lists overrides', () => {
     const state = { ...initialState, timeZone: 'UTC', locale: 'ja-JP' };

@@ -27,6 +27,10 @@ export interface SetOptions {
   locale?: string | null;
   /** IANA zone for Intl formatting only; `getHours()` and friends keep the device zone. */
   experimental_timeZone?: string | null;
+  /** Pseudo-localize strings that go through `pseudo()` or the i18n adapters. */
+  pseudo?: boolean;
+  /** Right-to-left layout. On React Native this takes effect after a reload. */
+  rtl?: boolean;
 }
 
 const KEY = 'helder-studio:timewarp';
@@ -120,6 +124,8 @@ export const timewarp = {
       if (options.experimental_timeZone !== null) assertTimeZone(options.experimental_timeZone);
       next = { ...next, timeZone: options.experimental_timeZone };
     }
+    if (options.pseudo !== undefined) next = { ...next, pseudo: options.pseudo };
+    if (options.rtl !== undefined) next = { ...next, rtl: options.rtl };
     update(next);
   },
 

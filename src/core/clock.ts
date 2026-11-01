@@ -7,6 +7,10 @@ export interface TimewarpState {
   locale: string | null;
   /** Experimental: default `timeZone` for Intl formatting. Date getters keep the device zone. */
   timeZone: string | null;
+  /** Pseudo-localize strings passed through the i18n adapters (`[Ŝéţţîñĝš ···]`). */
+  pseudo: boolean;
+  /** Right-to-left layout (web: `dir="rtl"`; React Native: `I18nManager`, needs a reload). */
+  rtl: boolean;
 }
 
 export const initialState: TimewarpState = {
@@ -14,6 +18,8 @@ export const initialState: TimewarpState = {
   frozenAt: null,
   locale: null,
   timeZone: null,
+  pseudo: false,
+  rtl: false,
 };
 
 export interface TravelDelta {
@@ -35,7 +41,9 @@ export function isWarped(state: TimewarpState): boolean {
     state.offsetMs !== 0 ||
     state.frozenAt !== null ||
     state.locale !== null ||
-    state.timeZone !== null
+    state.timeZone !== null ||
+    state.pseudo ||
+    state.rtl
   );
 }
 

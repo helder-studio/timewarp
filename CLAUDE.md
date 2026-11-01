@@ -15,6 +15,10 @@ real devices. React Native + web. PDF: "Library 3: Timewarp".
   Patched code reads state on every call. Idempotent via `Symbol.for('helder-studio.timewarp')`.
 - `src/timewarp.ts`: singleton API, persistence under `helder-studio:timewarp`, no patching on the
   server (no `document` and not React Native).
+- `src/core/pseudo.ts`: pseudo-localizer (balanced braces protected for ICU). `src/i18n.ts`: adapters
+  (`pseudo`, `pseudoMessages`, i18next `pseudoPostProcessor`) that act only while `state.pseudo`.
+- RTL: web badge sets `<html dir>` and restores it; native `useNativeRtl` calls `I18nManager.forceRTL`
+  (applies after reload; the panel offers `DevSettings.reload()`).
 - `src/react/`: hooks + web badge. `src/native/`: badge + Modal panel, `TimewarpPanel` for dev-dock.
 - Entries: `index` (web), `native` (`react-native` condition), `noop`.
 
