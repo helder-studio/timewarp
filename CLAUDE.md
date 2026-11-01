@@ -19,7 +19,10 @@ real devices. React Native + web. PDF: "Library 3: Timewarp".
 ## Notes
 
 - Tests set `process.env.TZ` at runtime (Node honours it) for the Amsterdam / New York DST cases.
-- Timezone stays experimental: Date getters can't follow it without patching every getter (spike open).
+- Timezone spike (2026-11-01): local getters (`getFullYear`…`getSeconds`, `getDay`, `getTimezoneOffset`)
+  read the zone via a cached `formatToParts`; DST tests for Amsterdam / New York / Tokyo pass. Local
+  constructors, setters and `toString()` stay in the device zone, so it ships as `experimental_timeZone`.
+  Timewarp's own calendar math runs inside `inDeviceZone()`.
 - Hermes `Intl` timeZone support on Android is unverified: device check needed.
 
 ## Commands

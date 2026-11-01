@@ -10,6 +10,18 @@ type Saved = {
 };
 
 const INSTALLED = Symbol.for('helder-studio.timewarp');
+
+let deviceZoneDepth = 0;
+
+/** Runs `fn` with Date getters in the device zone, for timewarp's own calendar math. */
+export function inDeviceZone<T>(fn: () => T): T {
+  deviceZoneDepth++;
+  try {
+    return fn();
+  } finally {
+    deviceZoneDepth--;
+  }
+}
 const registry = globalThis as unknown as Record<symbol, Saved | undefined>;
 
 const INTL_CONSTRUCTORS = [
@@ -27,6 +39,71 @@ const INTL_CONSTRUCTORS = [
 const RealIntl: Record<string, unknown> = Object.fromEntries(
   INTL_CONSTRUCTORS.map((name) => [name, (Intl as unknown as Record<string, unknown>)[name]]),
 );
+
+interface ZoneParts {
+  year: number;
+  month: number;
+  day: number;
+  weekday: number;
+  hour: number;
+  minute: number;
+  second: number;
+  offset: number;
+}
+
+const GETTERS: [string, keyof ZoneParts][] = [
+  ['getFullYear', 'year'],
+  ['getMonth', 'month'],
+  ['getDate', 'day'],
+  ['getDay', 'weekday'],
+  ['getHours', 'hour'],
+  ['getMinutes', 'minute'],
+  ['getSeconds', 'second'],
+  ['getTimezoneOffset', 'offset'],
+];
+
+const WEEKDAYS: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+const formatters = new Map<string, Intl.DateTimeFormat>();
+
+/** Wall-clock parts of `time` in `timeZone`, plus the getTimezoneOffset-style offset in minutes. */
+export function zoneParts(time: number, timeZone: string): ZoneParts {
+  let format = formatters.get(timeZone);
+  if (!format) {
+    format = new (RealIntl.DateTimeFormat as typeof Intl.DateTimeFormat)('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      weekday: 'short',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    });
+    formatters.set(timeZone, format);
+  }
+  const get: Record<string, string> = {};
+  for (const { type, value } of format.formatToParts(time)) get[type] = value;
+  const parts = {
+    year: Number(get.year),
+    month: Number(get.month) - 1,
+    day: Number(get.day),
+    weekday: WEEKDAYS[get.weekday as string] ?? 0,
+    hour: Number(get.hour),
+    minute: Number(get.minute),
+    second: Number(get.second),
+  };
+  const wallAsUtc = RealDate.UTC(
+    parts.year,
+    parts.month,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  );
+  const offset = Math.round((Math.floor(time / 1000) * 1000 - wallAsUtc) / 60_000);
+  return { ...parts, offset };
+}
 
 type Options = Record<string, unknown> | undefined;
 
@@ -84,6 +161,23 @@ export function patch(now: () => number, getState: () => TimewarpState): void {
       locale(locales),
       withZone(options as Options),
     ]);
+  }
+  // Experimental zone: local-time getters read the wall clock of the chosen zone. Constructors with
+  // local components, setters and toString() keep the device zone (documented as partial).
+  const zoned = (target: Date, part: keyof ZoneParts): number | undefined => {
+    const timeZone = getState().timeZone;
+    if (!timeZone || deviceZoneDepth > 0) return undefined;
+    const time = RealDate.prototype.getTime.call(target);
+    return Number.isNaN(time) ? Number.NaN : zoneParts(time, timeZone)[part];
+  };
+  for (const [name, part] of GETTERS) {
+    const original = (RealDate.prototype as unknown as Record<string, () => number>)[
+      name
+    ] as () => number;
+    saved.methods.push([RealDate.prototype, name, original]);
+    (RealDate.prototype as unknown as Record<string, () => number>)[name] = function (this: Date) {
+      return zoned(this, part) ?? original.call(this);
+    };
   }
   wrapMethod(Number.prototype, 'toLocaleString', ([locales, options]) => [
     locale(locales),

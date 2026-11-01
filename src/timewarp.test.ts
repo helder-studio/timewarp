@@ -150,3 +150,41 @@ describe('install', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('experimental time zone getters', () => {
+  const at = (...args: Parameters<typeof Date.UTC>) => new Date(Date.UTC(...args));
+
+  it('follows Europe/Amsterdam across the spring-forward change', () => {
+    timewarp.set({ experimental_timeZone: 'Europe/Amsterdam' });
+    const before = at(2026, 2, 29, 0, 59);
+    const after = at(2026, 2, 29, 1, 0);
+    expect([before.getHours(), before.getMinutes(), before.getTimezoneOffset()]).toEqual([1, 59, -60]);
+    expect([after.getHours(), after.getMinutes(), after.getTimezoneOffset()]).toEqual([3, 0, -120]);
+  });
+
+  it('follows America/New_York across the fall-back change', () => {
+    timewarp.set({ experimental_timeZone: 'America/New_York' });
+    const before = at(2026, 10, 1, 5, 59);
+    const after = at(2026, 10, 1, 6, 0);
+    expect([before.getHours(), before.getTimezoneOffset()]).toEqual([1, 240]);
+    expect([after.getHours(), after.getTimezoneOffset()]).toEqual([1, 300]);
+    expect([after.getFullYear(), after.getMonth(), after.getDate(), after.getDay()]).toEqual([2026, 10, 1, 0]);
+  });
+
+  it('reads the calendar date in the zone and leaves UTC getters alone', () => {
+    timewarp.set({ experimental_timeZone: 'Asia/Tokyo' });
+    const d = at(2026, 11, 31, 20, 0); // 1 Jan 05:00 in Tokyo
+    expect([d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()]).toEqual([2027, 0, 1, 5]);
+    expect(d.getUTCHours()).toBe(20);
+    expect(Number.isNaN(new Date(Number.NaN).getHours())).toBe(true);
+    timewarp.set({ experimental_timeZone: null });
+    expect(d.getHours()).toBe(new RealDate(d.getTime()).getHours());
+  });
+
+  it('keeps travel and presets in the device zone', () => {
+    timewarp.set({ now: '2030-06-15T10:00:00Z', experimental_timeZone: 'Asia/Tokyo' });
+    const before = Date.now();
+    timewarp.travel({ days: 1 });
+    expect(Math.round((Date.now() - before) / HOUR)).toBe(24);
+  });
+});

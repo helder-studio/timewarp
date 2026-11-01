@@ -68,11 +68,11 @@ timewarp.reset();
 
 ## What gets overridden
 
-| Override                   | How                                                                         | Reliability                                                          |
-| -------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `new Date()`, `Date.now()` | `Date` is replaced; real time + offset, or a frozen instant                 | high                                                                 |
-| Locale                     | Intl constructors and `toLocale*String` get your locale when none is passed | high for Intl-based code                                             |
-| Time zone (experimental)   | `timeZone` is injected into Intl formatting                                 | partial: `getHours()` and `getTimezoneOffset()` keep the device zone |
+| Override                   | How                                                                                                                                  | Reliability                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `new Date()`, `Date.now()` | `Date` is replaced; real time + offset, or a frozen instant                                                                          | high                                                                        |
+| Locale                     | Intl constructors and `toLocale*String` get your locale when none is passed                                                          | high for Intl-based code                                                    |
+| Time zone (experimental)   | `timeZone` injected into Intl formatting; `getHours()`, `getDate()`, `getTimezoneOffset()` and the other local getters read the zone | partial: `new Date(y, m, d)`, setters and `toString()` keep the device zone |
 
 `instanceof Date`, `Date.UTC`, `Date.parse`, `Date()` and JSON round trips keep working. Timers are
 not touched: this is time travel, not time acceleration. i18n libraries with their own locale setting

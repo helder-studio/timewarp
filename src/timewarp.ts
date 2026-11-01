@@ -11,7 +11,7 @@ import {
   virtualNow,
 } from './core/clock';
 import { type PresetName, presetTime } from './core/presets';
-import { assertTimeZone, isPatched, patch, RealDate, unpatch } from './patch';
+import { assertTimeZone, inDeviceZone, isPatched, patch, RealDate, unpatch } from './patch';
 
 export interface InstallOptions {
   /** Off: nothing is patched. Pass something like `__DEV__ || Config.QA_BUILD`. */
@@ -125,11 +125,12 @@ export const timewarp = {
 
   /** Jumps relative to the virtual time; negative values go back. */
   travel(delta: TravelDelta): void {
-    update(setTime(state, addDelta(timewarp.now(), delta, RealDate), realNow()));
+    const target = inDeviceZone(() => addDelta(timewarp.now(), delta, RealDate));
+    update(setTime(state, target, realNow()));
   },
 
   preset(name: PresetName): void {
-    const target = presetTime(name, timewarp.now(), RealDate);
+    const target = inDeviceZone(() => presetTime(name, timewarp.now(), RealDate));
     if (target !== null) update(setTime(state, target, realNow()));
   },
 
