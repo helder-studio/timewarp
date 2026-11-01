@@ -1,6 +1,6 @@
 {
   "name": "@helder-studio/timewarp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Change the app clock and locale on a real device: travel to tomorrow, freeze time, switch to de-DE. For QA builds of React Native and web apps.",
   "keywords": [
     "react-native",
